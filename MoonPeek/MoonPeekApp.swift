@@ -2,8 +2,6 @@
 //  MoonPeekApp.swift
 //  MoonPeek
 //
-//  Created by chris achinga on 6/6/26.
-//
 
 import SwiftUI
 import SwiftData
@@ -11,11 +9,8 @@ import SwiftData
 @main
 struct MoonPeekApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
+        let schema = Schema([Photo.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
@@ -26,6 +21,7 @@ struct MoonPeekApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.dark)
         }
         .modelContainer(sharedModelContainer)
     }

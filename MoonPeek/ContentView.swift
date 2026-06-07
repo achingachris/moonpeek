@@ -2,60 +2,53 @@
 //  ContentView.swift
 //  MoonPeek
 //
-//  Created by chris achinga on 6/6/26.
-//
 
 import SwiftUI
 import SwiftData
 
+enum AppTab: Hashable {
+    case explore, favorites, notes, settings
+}
+
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var selectedTab: AppTab = .explore
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+        TabView(selection: $selectedTab) {
+            Tab("Explore", systemImage: "sparkles", value: AppTab.explore) {
+                NavigationStack {
+                    ExploreView()
+                        .navigationDestination(for: Photo.self) { PhotoDetailView(photo: $0) }
                 }
             }
-        } detail: {
-            Text("Select an item")
-        }
-    }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
+            Tab("Favorites", systemImage: "heart", value: AppTab.favorites) {
+                NavigationStack {
+                    FavoritesView()
+                        .navigationDestination(for: Photo.self) { PhotoDetailView(photo: $0) }
+                }
+            }
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            Tab("Notes", systemImage: "square.and.pencil", value: AppTab.notes) {
+                NavigationStack {
+                    NotesView()
+                        .navigationDestination(for: Photo.self) { PhotoDetailView(photo: $0) }
+                }
+            }
+
+            Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {
+                NavigationStack {
+                    SettingsView()
+                }
             }
         }
+        .tabBarMinimizeBehavior(.onScrollDown)
+        .preferredColorScheme(.dark)
+        .tint(.white)
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: Photo.self, inMemory: true)
 }
