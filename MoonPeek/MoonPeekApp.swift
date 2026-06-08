@@ -24,6 +24,10 @@ struct MoonPeekApp: App {
         WindowGroup {
             ContentView()
                 .preferredColorScheme(themeMode.colorScheme)
+                .task {
+                    WatchPusher.shared.activate()
+                    await FavoritesSnapshotSync.refresh(modelContext: sharedModelContainer.mainContext)
+                }
         }
         .modelContainer(sharedModelContainer)
     }

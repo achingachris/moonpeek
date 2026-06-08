@@ -101,7 +101,10 @@ struct PhotoDetailView: View {
             case .note:
                 NoteEditorSheet(
                     photo: currentPhoto,
-                    onSave: { try? modelContext.save() },
+                    onSave: {
+                        try? modelContext.save()
+                        refreshSnapshot()
+                    },
                     onShareWithNote: { self.sheet = .share }
                 )
             case .share:
@@ -151,6 +154,7 @@ struct PhotoDetailView: View {
                 Button {
                     currentPhoto.isFavorite.toggle()
                     try? modelContext.save()
+                    refreshSnapshot()
                     scheduleAutoHide()
                 } label: {
                     Image(systemName: currentPhoto.isFavorite ? "heart.fill" : "heart")
@@ -213,6 +217,11 @@ struct PhotoDetailView: View {
         guard !tapped.isFavorite else { return }
         tapped.isFavorite = true
         try? modelContext.save()
+        refreshSnapshot()
+    }
+
+    private func refreshSnapshot() {
+        Task { await FavoritesSnapshotSync.refresh(modelContext: modelContext) }
     }
 
     private func scheduleAutoHide() {
