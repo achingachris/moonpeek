@@ -11,9 +11,21 @@ enum AppTab: Hashable {
 }
 
 struct ContentView: View {
+    @AppStorage("hasOnboarded") private var hasOnboarded: Bool = false
     @State private var selectedTab: AppTab = .explore
 
     var body: some View {
+        Group {
+            if hasOnboarded {
+                mainTabs
+            } else {
+                OnboardingView()
+                    .transition(.opacity)
+            }
+        }
+    }
+
+    private var mainTabs: some View {
         TabView(selection: $selectedTab) {
             Tab("Explore", systemImage: "sparkles", value: AppTab.explore) {
                 NavigationStack {
@@ -43,8 +55,7 @@ struct ContentView: View {
             }
         }
         .tabBarMinimizeBehavior(.onScrollDown)
-        .preferredColorScheme(.dark)
-        .tint(.white)
+        .tint(.accentColor)
     }
 }
 

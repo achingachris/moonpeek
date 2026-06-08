@@ -14,6 +14,7 @@ struct ExploreView: View {
 
     @State private var isRefreshing = false
     @State private var hasLoadedOnce = false
+    @State private var loadError: String?
     @State private var searchText = ""
 
     private let columns = [
@@ -54,10 +55,16 @@ struct ExploreView: View {
                 if isRefreshing {
                     ProgressView()
                         .tint(.white)
+                } else if let loadError {
+                    EmptyStateView(
+                        title: "Couldn't Reach the Bucket",
+                        message: loadError,
+                        systemImage: "exclamationmark.icloud"
+                    )
                 } else {
                     EmptyStateView(
                         title: "No Photos Yet",
-                        message: "Pull down to load the latest Artemis II imagery from NASA.",
+                        message: "Pull down to load the latest Artemis imagery.",
                         systemImage: "moon.stars"
                     )
                 }
@@ -65,18 +72,23 @@ struct ExploreView: View {
         }
         .navigationTitle("Explore")
         .navigationBarTitleDisplayMode(.large)
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Artemis II")
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Artemis")
         .task {
             guard !hasLoadedOnce else { return }
             hasLoadedOnce = true
+            PhotoCatalog.purgeLegacySamples(modelContext: modelContext)
             await refresh()
         }
     }
 
     private func refresh() async {
         isRefreshing = true
+        loadError = nil
         defer { isRefreshing = false }
-        await PhotoCatalog.refresh(modelContext: modelContext)
-        PhotoCatalog.seedSamplesIfEmpty(modelContext: modelContext)
+        do {
+            try await PhotoCatalog.refresh(modelContext: modelContext)
+        } catch {
+            loadError = error.localizedDescription
+        }
     }
 }

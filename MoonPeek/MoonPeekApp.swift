@@ -8,6 +8,8 @@ import SwiftData
 
 @main
 struct MoonPeekApp: App {
+    @AppStorage("themeMode") private var themeMode: ThemeMode = .dark
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([Photo.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -21,7 +23,7 @@ struct MoonPeekApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(themeMode.colorScheme)
         }
         .modelContainer(sharedModelContainer)
     }

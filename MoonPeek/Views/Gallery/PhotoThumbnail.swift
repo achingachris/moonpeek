@@ -12,33 +12,33 @@ struct PhotoGridItem: View {
     var aspectRatio: CGFloat = 4.0 / 5.0
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            RemoteImageView(urlString: photo.remoteURL, contentMode: .fill)
-                .aspectRatio(aspectRatio, contentMode: .fill)
-                .frame(maxWidth: .infinity)
-                .clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-
-            LinearGradient(
-                colors: [.black.opacity(0.7), .black.opacity(0.0)],
-                startPoint: .bottom,
-                endPoint: .center
-            )
+        // A Color base layer locks the card to the requested aspect ratio inside
+        // the grid cell. The image is overlaid on top and clipped to those bounds.
+        Color.black
+            .aspectRatio(aspectRatio, contentMode: .fit)
+            .overlay {
+                RemoteImageView(urlString: photo.remoteURL, contentMode: .fill)
+            }
+            .overlay(alignment: .bottom) {
+                LinearGradient(
+                    colors: [.black.opacity(0.7), .black.opacity(0.0)],
+                    startPoint: .bottom,
+                    endPoint: .center
+                )
+                .allowsHitTesting(false)
+            }
+            .overlay(alignment: .bottomLeading) {
+                captionPill.padding(10)
+            }
+            .overlay(alignment: .topTrailing) {
+                indicators.padding(10)
+            }
             .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .allowsHitTesting(false)
-
-            captionPill
-                .padding(10)
-        }
-        .overlay(alignment: .topTrailing) {
-            indicators
-                .padding(10)
-        }
-        .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .strokeBorder(.white.opacity(0.06), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.35), radius: 10, x: 0, y: 6)
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .strokeBorder(.white.opacity(0.06), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.35), radius: 10, x: 0, y: 6)
     }
 
     private var captionPill: some View {

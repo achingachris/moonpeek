@@ -11,6 +11,7 @@ struct VerticalPhotoPagerView: View {
     let photos: [Photo]
     @Binding var currentID: String?
     let onTap: () -> Void
+    let onDoubleTap: (Photo) -> Void
     let onImageLoaded: (String, UIImage) -> Void
 
     var body: some View {
@@ -21,6 +22,7 @@ struct VerticalPhotoPagerView: View {
                         FullScreenPhotoPage(
                             photo: photo,
                             onTap: onTap,
+                            onDoubleTap: { onDoubleTap(photo) },
                             onImageLoaded: { onImageLoaded(photo.remoteID, $0) }
                         )
                         .frame(width: proxy.size.width, height: proxy.size.height)
@@ -39,11 +41,17 @@ struct VerticalPhotoPagerView: View {
 private struct FullScreenPhotoPage: View {
     let photo: Photo
     let onTap: () -> Void
+    let onDoubleTap: () -> Void
     let onImageLoaded: (UIImage) -> Void
 
     @State private var uiImage: UIImage?
     @State private var zoomScale: CGFloat = 1.0
     @State private var liveZoom: CGFloat = 1.0
+
+    // Heart-burst animation state.
+    @State private var heartScale: CGFloat = 0.4
+    @State private var heartOpacity: CGFloat = 0.0
+    @State private var heartTrigger: Int = 0
 
     var body: some View {
         ZStack {
@@ -75,14 +83,20 @@ private struct FullScreenPhotoPage: View {
                     .tint(.white)
                     .controlSize(.large)
             }
+
+            // Instagram-style heart pop overlay.
+            Image(systemName: "heart.fill")
+                .font(.system(size: 120, weight: .bold))
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.55), radius: 22)
+                .scaleEffect(heartScale)
+                .opacity(heartOpacity)
+                .allowsHitTesting(false)
         }
         .contentShape(Rectangle())
-        .onTapGesture(count: 2) {
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                zoomScale = zoomScale > 1.0 ? 1.0 : 2.0
-            }
-        }
+        .onTapGesture(count: 2) { triggerHeart() }
         .onTapGesture { onTap() }
+        .sensoryFeedback(.success, trigger: heartTrigger)
         .task(id: photo.remoteURL) {
             let loaded = await ImageLoader.shared.image(for: photo.remoteURL)
             await MainActor.run {
@@ -93,6 +107,29 @@ private struct FullScreenPhotoPage: View {
         .onDisappear {
             zoomScale = 1.0
             liveZoom = 1.0
+            heartScale = 0.4
+            heartOpacity = 0.0
+        }
+    }
+
+    private func triggerHeart() {
+        heartTrigger &+= 1
+        onDoubleTap()
+
+        // Reset, then spring in.
+        heartScale = 0.4
+        heartOpacity = 0.0
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.55)) {
+            heartScale = 1.0
+            heartOpacity = 1.0
+        }
+        // Linger briefly, then fade-out + scale-up.
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(450))
+            withAnimation(.easeOut(duration: 0.4)) {
+                heartScale = 1.18
+                heartOpacity = 0.0
+            }
         }
     }
 }
