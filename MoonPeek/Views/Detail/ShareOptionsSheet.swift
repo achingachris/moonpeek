@@ -48,13 +48,13 @@ struct ShareOptionsSheet: View {
 
             VStack(spacing: 18) {
                 Capsule()
-                    .fill(.white.opacity(0.25))
+                    .fill(.secondary.opacity(0.4))
                     .frame(width: 38, height: 5)
                     .padding(.top, 10)
 
                 Text("Share")
                     .font(.title3.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
 
                 VStack(spacing: 12) {
                     ForEach(ShareKind.allCases) { kind in
@@ -125,24 +125,24 @@ struct ShareOptionsSheet: View {
         HStack(spacing: 14) {
             Image(systemName: kind.systemImage)
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
                 .frame(width: 38, height: 38)
                 .glassEffect(.clear, in: Circle())
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(kind.title)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 Text(kind.subtitle)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.tertiary)
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)

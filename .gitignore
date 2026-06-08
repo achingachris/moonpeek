@@ -187,3 +187,5 @@ xcuserdata
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.toptal.com/developers/gitignore/api/swift,swiftpackagemanager,swiftpm,xcode,macos
+# Local secrets — see MoonPeek/Services/Secrets.swift.example for the template
+MoonPeek/Services/Secrets.swift

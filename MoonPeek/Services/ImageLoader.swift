@@ -32,14 +32,33 @@ actor ImageLoader {
                 self.memoryCache.setObject(disk, forKey: urlString as NSString)
                 return disk
             }
-            guard let url = URL(string: urlString) else { return nil }
+            guard let url = await PhotoService.signedURL(forPublicURL: urlString) else {
+                #if DEBUG
+                print("[ImageLoader] invalid URL: \(urlString)")
+                #endif
+                return nil
+            }
             do {
-                let (data, _) = try await URLSession.shared.data(from: url)
-                guard let img = UIImage(data: data) else { return nil }
+                let (data, response) = try await URLSession.shared.data(from: url)
+                if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                    #if DEBUG
+                    print("[ImageLoader] HTTP \(http.statusCode) for \(urlString)")
+                    #endif
+                    return nil
+                }
+                guard let img = UIImage(data: data) else {
+                    #if DEBUG
+                    print("[ImageLoader] decode failed (\(data.count) bytes) for \(urlString)")
+                    #endif
+                    return nil
+                }
                 self.memoryCache.setObject(img, forKey: urlString as NSString)
                 self.saveToDisk(data: data, key: urlString)
                 return img
             } catch {
+                #if DEBUG
+                print("[ImageLoader] network error for \(urlString): \(error.localizedDescription)")
+                #endif
                 return nil
             }
         }

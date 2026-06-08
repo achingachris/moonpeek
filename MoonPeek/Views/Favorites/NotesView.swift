@@ -56,25 +56,25 @@ private struct NoteRow: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(photo.title)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .lineLimit(1)
                 Text(photo.note)
                     .font(.footnote)
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
                     .lineLimit(3)
 
                 Spacer(minLength: 0)
 
                 Text(photo.addedAt, format: .relative(presentation: .named))
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.55))
+                    .foregroundStyle(.tertiary)
             }
 
             Spacer(minLength: 0)
 
             Image(systemName: "chevron.right")
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.tertiary)
                 .padding(.top, 4)
         }
         .padding(14)

@@ -55,22 +55,19 @@ struct WallpaperPreviewView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .tint(.white)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: save) {
                         if isSaving {
-                            ProgressView().controlSize(.small).tint(.white)
+                            ProgressView().controlSize(.small)
                         } else {
                             Text("Save").bold()
                         }
                     }
                     .disabled(isSaving)
-                    .tint(.white)
                 }
             }
         }
-        .preferredColorScheme(.dark)
     }
 
     // MARK: - Preview
@@ -160,29 +157,29 @@ struct WallpaperPreviewView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Label("Zoom", systemImage: "plus.magnifyingglass")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 Slider(value: $scale, in: 0.6...2.2)
-                    .tint(.white)
+                    .tint(.accentColor)
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 Label("Dim", systemImage: "circle.lefthalf.filled")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 Slider(value: $dim, in: 0...0.6)
-                    .tint(.white)
+                    .tint(.accentColor)
             }
 
             Toggle(isOn: $useBlur) {
                 Label("Blur background", systemImage: "drop.fill")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
             .tint(.accentColor)
 
             Text("After saving, open Photos → Share → Use as Wallpaper to set it.")
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
                 .padding(.top, 4)

@@ -23,7 +23,7 @@ struct NoteEditorSheet: View {
 
             VStack(spacing: 16) {
                 Capsule()
-                    .fill(.white.opacity(0.25))
+                    .fill(.secondary.opacity(0.4))
                     .frame(width: 38, height: 5)
                     .padding(.top, 10)
 
@@ -35,12 +35,12 @@ struct NoteEditorSheet: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(photo.title)
                             .font(.headline)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                             .lineLimit(1)
                         if let date = photo.dateTaken {
                             Text(date, format: .dateTime.month(.wide).day().year())
                                 .font(.caption)
-                                .foregroundStyle(.white.opacity(0.6))
+                                .foregroundStyle(.secondary)
                         }
                     }
                     Spacer()
@@ -54,8 +54,8 @@ struct NoteEditorSheet: View {
                 )
                 .focused($isEditing)
                 .font(.body)
-                .foregroundStyle(.white)
-                .tint(.white)
+                .foregroundStyle(.primary)
+                .tint(.accentColor)
                 .lineLimit(4...10)
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .topLeading)

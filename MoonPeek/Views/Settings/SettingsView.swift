@@ -23,6 +23,8 @@ struct SettingsView: View {
     @Query private var photos: [Photo]
 
     @AppStorage("downloadQuality") private var downloadQuality: DownloadQuality = .optimized
+    @AppStorage("themeMode") private var themeMode: ThemeMode = .dark
+    @AppStorage("userNickname") private var nickname: String = ""
 
     @State private var cacheSize: Int64 = 0
     @State private var toast: ToastMessage?
@@ -39,6 +41,31 @@ struct SettingsView: View {
 
             ScrollView {
                 VStack(spacing: 18) {
+                    panel(title: "You", systemImage: "person.crop.circle") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Nickname")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            TextField("Your nickname", text: $nickname)
+                                .textInputAutocapitalization(.words)
+                                .autocorrectionDisabled()
+                                .submitLabel(.done)
+                                .padding(12)
+                                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        }
+                    }
+
+                    panel(title: "Appearance", systemImage: "paintbrush") {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Picker("Theme", selection: $themeMode) {
+                                ForEach(ThemeMode.allCases) { mode in
+                                    Label(mode.label, systemImage: mode.icon).tag(mode)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                        }
+                    }
+
                     panel(title: "Downloads", systemImage: "arrow.down.circle") {
                         VStack(alignment: .leading, spacing: 14) {
                             Picker("Download quality", selection: $downloadQuality) {
@@ -50,7 +77,7 @@ struct SettingsView: View {
 
                             Text(downloadQuality.description)
                                 .font(.footnote)
-                                .foregroundStyle(.white.opacity(0.65))
+                                .foregroundStyle(.secondary)
                         }
                     }
 
@@ -58,10 +85,10 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 14) {
                             HStack {
                                 Text("Image cache")
-                                    .foregroundStyle(.white.opacity(0.85))
+                                    .foregroundStyle(.primary)
                                 Spacer()
                                 Text(formattedSize(cacheSize))
-                                    .foregroundStyle(.white.opacity(0.65))
+                                    .foregroundStyle(.secondary)
                                     .monospacedDigit()
                             }
 
@@ -87,7 +114,7 @@ struct SettingsView: View {
 
                             Text("MoonPeek does not collect personal data. Photos and notes are stored on-device only.")
                                 .font(.footnote)
-                                .foregroundStyle(.white.opacity(0.65))
+                                .foregroundStyle(.secondary)
                                 .padding(.top, 6)
                         }
                     }
@@ -110,7 +137,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 14) {
             Label(title, systemImage: systemImage)
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
 
             content()
         }
@@ -121,9 +148,9 @@ struct SettingsView: View {
 
     private func row(_ label: String, value: String) -> some View {
         HStack {
-            Text(label).foregroundStyle(.white.opacity(0.85))
+            Text(label).foregroundStyle(.primary)
             Spacer()
-            Text(value).foregroundStyle(.white.opacity(0.65))
+            Text(value).foregroundStyle(.secondary)
         }
     }
 

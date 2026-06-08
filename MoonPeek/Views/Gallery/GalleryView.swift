@@ -15,36 +15,36 @@ struct ExploreView: View {
     @State private var isRefreshing = false
     @State private var hasLoadedOnce = false
     @State private var loadError: String?
-    @State private var searchText = ""
+
+    @AppStorage("userNickname") private var nickname: String = ""
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12)
     ]
 
-    private var filteredPhotos: [Photo] {
-        guard !searchText.isEmpty else { return photos }
-        let needle = searchText.lowercased()
-        return photos.filter {
-            $0.title.lowercased().contains(needle)
-            || $0.caption.lowercased().contains(needle)
-        }
-    }
-
     var body: some View {
         ZStack {
             SpaceBackground()
 
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(filteredPhotos) { photo in
-                        NavigationLink(value: photo) {
-                            PhotoGridItem(photo: photo)
-                        }
-                        .buttonStyle(.plain)
+                VStack(alignment: .leading, spacing: 12) {
+                    if !nickname.isEmpty {
+                        greeting
+                            .padding(.horizontal, 16)
+                            .padding(.top, 4)
                     }
+
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(photos) { photo in
+                            NavigationLink(value: photo) {
+                                PhotoGridItem(photo: photo)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
                 .padding(.top, 8)
                 .padding(.bottom, 120)
             }
@@ -72,13 +72,24 @@ struct ExploreView: View {
         }
         .navigationTitle("Explore")
         .navigationBarTitleDisplayMode(.large)
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Artemis")
         .task {
             guard !hasLoadedOnce else { return }
             hasLoadedOnce = true
             PhotoCatalog.purgeLegacySamples(modelContext: modelContext)
             await refresh()
         }
+    }
+
+    private var greeting: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("Welcome back")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Text("Hey, \(nickname) 👋")
+                .font(.title2.weight(.bold))
+                .foregroundStyle(.primary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func refresh() async {

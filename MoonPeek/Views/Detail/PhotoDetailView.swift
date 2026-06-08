@@ -55,6 +55,7 @@ struct PhotoDetailView: View {
                 photos: pagerPhotos,
                 currentID: $currentID,
                 onTap: toggleChrome,
+                onDoubleTap: favoriteOnDoubleTap,
                 onImageLoaded: { id, image in
                     if id == currentID { currentUIImage = image }
                 }
@@ -204,6 +205,14 @@ struct PhotoDetailView: View {
             chromeVisible.toggle()
         }
         scheduleAutoHide()
+    }
+
+    /// Instagram-style: double-tap sets favorite (never un-favorites).
+    /// Use the top-bar heart button to un-favorite.
+    private func favoriteOnDoubleTap(_ tapped: Photo) {
+        guard !tapped.isFavorite else { return }
+        tapped.isFavorite = true
+        try? modelContext.save()
     }
 
     private func scheduleAutoHide() {
